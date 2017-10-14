@@ -1,0 +1,168 @@
+Hex Generator Tool - 
+
+The hex generator tool is used for generating random instruction sequence tests and supports the following set of instructions - 
+ADD     
+ADDU    
+ADDI    
+ADDIU   
+AND     
+ANDI    
+BEQ
+BGEZ
+BGEZAL
+BGTZ
+BLEZ
+BLTZ
+BLTZAL
+BNE
+J
+JAL
+JR      
+LW      
+NOR     
+OR      
+ORI     
+SW      
+SLL     
+SLLV    
+SLT     
+SLTI    
+SLTIU   
+SLTU    
+SRA     
+SRAV    
+SRL     
+SRLV    
+SUB         
+SYSCALL 
+XOR     
+XORI
+
+The tool makes use of the already available Instruction Set simulator for generating the instructions. This helps in maintaining the test 
+integrity. The source of the tool is organised in the following manner
+hex_gen/src/       - contains the .c and .h files
+hex_gen/lib/       - contains the lib files required
+hex_gen/tests/     - contains the hex of the instructions to be run either on the model or the RTL
+hex_gen/tests/logs - contains the log files of the corresponding instruction hex files
+
+Currently,  the tool is designed as a simple C code but there are plans to extend it to be more object oriented in the future and possibly
+using C++ as the base language. The tool makes use of the available rand function in-order to randomly pick the type of the instruction
+(this could be either R-type instruction, I-type instruction or J-type instruction). Once the type is known, the opcode and funct field
+values are then selected randomly and hence the entire instruction hex is generated. Once the hex is generated the same instruction is
+loaded onto simulator memory (which is pointed by the current PC) and then executed. If the execution goes fine - the instruction is added
+and proceeds to the next instruction otherwise if the execution fails for some reason, the instruction is re-tried. 
+
+Generating a test - 
+Inside hex_gen directory do - 
+  make
+  ./hex_gen -i <no_of_i_type_instr> -r <no_of_r_type_instr> -j <no_of_j_type_instr>
+  (Note: You might need to set the LD_LIBRARY_PATH variable to point to the shared lib area)
+  Can be done using - 
+  export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:<path_to_the_shared_lib>
+  
+ Sample output - 
+  ./hex_gen -i 10 -r 10 -j 4
+  Generating the hex for the following set of instructions
+	  10 - R-Type instructions
+	  10 - I-Type instructions
+	   4 - J-Type instructions
+
+[0] I Type instr generated - 0x2e695102
+PC:00000000	INSTR:2e695102	 SLTIU R9 , R19, 9 
+SLTIU R9, R19, 5102
+
+[1] I Type instr generated - 0x112c0158
+PC:00000004	INSTR:112c0158	 BEQ R9 , R12, 344
+BEQ  R12, R9, 158
+
+[2] R Type instr generated - 0x3c10a61	
+PC:00000008	INSTR:03c10a61	 ADDU R1 , R30, R1 
+ADDU R1, R30, R1
+
+[3] J Type instr generated - 0x8000222	
+PC:0000000c	INSTR:08000222	 J 888     
+J    222     
+
+[4] R Type instr generated - 0x237c160	
+PC:00000888	INSTR:0237c160	 ADD R24, R17, R23
+ADD  R24, R17, R23
+
+[5] R Type instr generated - 0x337abe5	
+PC:0000088c	INSTR:0337abe5	 OR R21, R25, R23
+OR   R21, R25, R23
+
+[6] J Type instr generated - 0x8000067	
+PC:00000890	INSTR:08000067	 J 19c     
+J    67      
+
+[7] J Type instr generated - 0xc000128	
+PC:0000019c	INSTR:0c000128	 JAL 4a0     
+JAL  128     
+
+[8] J Type instr generated - 0x80002c2	
+PC:000004a0	INSTR:080002c2	 J b08     
+J    2c2     
+
+[9] I Type instr generated - 0x8e493179
+PC:00000b08	INSTR:8e493179	 LW R9 , R18, 12665
+LW   R9, R18, 3179
+
+[10] R Type instr generated - 0x0aa3a27	
+PC:00000b0c	INSTR:00aa3a27	 NOR R7 , R5 , R10
+NOR  R7, R5, R10
+
+[11] I Type instr generated - 0x1a19fe75
+PC:00000b10	INSTR:1a19fe75	 BLEZ R16, 260564
+BLEZ R25, R16, fffffe75
+
+[12] R Type instr generated - 0x0e17900	
+PC:000004e8	INSTR:00e17900	 SLL R15, R7 , R1 
+SLL  R15, R7, R1
+
+[13] I Type instr generated - 0x4410106 
+PC:000004ec	INSTR:04410106	 BGEZ R2 , 1048
+BGEZ R1, R2, 106
+
+[14] R Type instr generated - 0x3728bab	
+PC:00000908	INSTR:03728bab	 SLTU R17, R27, R18
+SLTU R17, R27, R18
+
+[15] R Type instr generated - 0x2cce343	
+PC:0000090c	INSTR:02cce343	 SRA R28, R12, 13
+SRA  R28, R22, R12
+
+[16] R Type instr generated - 0x26ee32b	
+PC:00000910	INSTR:026ee32b	 SLTU R28, R19, R14
+SLTU R28, R19, R14
+
+[17] R Type instr generated - 0x05a92ea	
+PC:00000914	INSTR:005a92ea	 SLT R18, R2 , R26
+SLT  R18, R2, R26
+
+[18] I Type instr generated - 0x1e49ff81
+PC:00000918	INSTR:1e49ff81	 BGTZ R18, 65409
+BGTZ R9, R18, ffffff81
+
+[19] R Type instr generated - 0x08d3d42	
+PC:0000091c	INSTR:008d3d42	 SRL R7 , R4 , R13
+SRL  R7, R4, R13
+
+[20] I Type instr generated - 0x7a0013a 
+PC:00000920	INSTR:07a0013a	 BLTZ R29, 314
+BLTZ R0, R29, 13a
+
+[21] I Type instr generated - 0x11ec00fb
+PC:00000924	INSTR:11ec00fb	 BEQ R15, R12, 1004
+BEQ  R12, R15, fb
+
+[22] I Type instr generated - 0x721fdc7 
+PC:00000d14	INSTR:0721fdc7	 BGEZ R25, 259868
+BGEZ R1, R25, fffffdc7
+
+[23] I Type instr generated - 0x8df97a53
+PC:00000434	INSTR:8df97a53	 LW R25, R15, 31315
+LW   R25, R15, 7a53
+
+PC:00000438	INSTR:2402000a	 ADDI R0 , R2 , 10
+PC:0000043c	INSTR:0000000c	 SYSCALL
+  

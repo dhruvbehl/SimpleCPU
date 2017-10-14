@@ -1,0 +1,17 @@
+*.so
+*.swp
+*.swo
+*.swn
+*.v.swp
+*.c.swp
+*.log
+*.wlf
+iss.so
+sim
+sim.dSYM
+work
+instr_hex
+pc_values_hex
+dumpsim
+transcript
+.DS_Store
